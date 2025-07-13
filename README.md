@@ -36,6 +36,7 @@ Run:
 Expected output:
 ./fwd -q 4 -s 2 -- -l 0-4 -n 4
 
+```
 EAL: Detected CPU lcores: 20
 EAL: Detected NUMA nodes: 1
 EAL: Detected shared linkage of DPDK
@@ -86,3 +87,4 @@ Port 1 | RX:    2664412 pkts | TX:          0 pkts | Drop:      621 | RX: 4273.6
 === Traffic Stats (Interval: 1s) ===
 Port 0 | RX:          0 pkts | TX:    3144923 pkts | Drop:        0 | RX:    0.00 Mbps | TX: 4257.09 Mbps
 Port 1 | RX:    3145544 pkts | TX:          0 pkts | Drop:      621 | RX: 4257.06 Mbps | TX:    0.00 Mbps
+```
