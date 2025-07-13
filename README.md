@@ -1,42 +1,48 @@
 # dpdk_fwd
 
-DPDK packet fwder / processor.
+DPDK packet forwarder / processor.
 
-Features:
-functionality:
-Drop packets if they are non-IP packets.
-Modify the packet headers (change the destination MAC address).
-Forward valid packets to the appropriate interface.
+## Features
 
-Periodic real time traffic statistics:
-Per interface received, forwarded, and dropped packets.
-Configurable interval.
+### Functionality
+- Drop packets if they are non-IP packets.
+- Modify the packet headers (e.g., change the destination MAC address).
+- Forward valid packets to the appropriate interface.
 
-Features(Bonus):
-Add a basic filtering mechanism to drop packets from certain IP addresses.
-TODO
-Implement a simple rate limiter to control the packet forwarding rate.
-Use multiple cores for improved performance (e.g., separate RX and TX threads).
+### Periodic real-time traffic statistics
+- Per-interface received, forwarded, and dropped packets.
+- Configurable interval.
 
-Perf:
-Use multiple RX/TX queues to enable parallel processing by multiple worker threads.
-Optimize memory access patterns for cache efficiency.
+### Bonus Features
+- Add a basic filtering mechanism to drop packets from certain IP addresses.
+#### TODO
+- Implement a simple rate limiter to control the packet forwarding rate.
+- Use multiple cores for improved performance (e.g., separate RX and TX threads).
 
-Dependencies:
-DPDK (tested with 21.11) and DPDK dependencies
-gcc to build
+## Performance
+- Use multiple RX/TX queues to enable parallel processing by multiple worker threads.
+- Optimize memory access patterns for cache efficiency.
 
-Build:
+## Dependencies
+- DPDK (tested with 21.11) and DPDK dependencies
+- `gcc` to build
+
+## Build
+```
 cd fwd
 make
+```
 
-Run:
+## Run
+```
 ./fwd [-q num_queues] [-s stats_interval_sec] -- <EAL args>
+```
 
-Expected output:
+## Expected output
+```
 ./fwd -q 4 -s 2 -- -l 0-4 -n 4
 
-```
+
 EAL: Detected CPU lcores: 20
 EAL: Detected NUMA nodes: 1
 EAL: Detected shared linkage of DPDK
