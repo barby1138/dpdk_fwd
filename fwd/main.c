@@ -235,52 +235,52 @@ lcore_worker_main(__rte_unused void *arg)
 		g_port_stats[port ^ 1].rx_bytes += rx_bytes;
 
 
-		for (uint16_t i = 0; i < nb_rx; i++) 
-		{
-    		struct rte_mbuf *mbuf = bufs[i];
-			if(mbuf) 
-			{
-				rte_prefetch0(rte_pktmbuf_mtod(mbuf, void*));
-    			// process mbuf
-			}
-		}
-
 		uint16_t nb_to_tx = 0;
     	struct rte_mbuf *to_tx_bufs[BURST_SIZE];
     	for (uint16_t i = 0; i < nb_rx; i++) 
 		{
         	struct rte_mbuf *mbuf = bufs[i];
+
+			if(!mbuf) 
+			{
+				continue;
+			}
+				
+			// load to cache
+			rte_prefetch0(rte_pktmbuf_mtod(mbuf, void*));
+    		
+			// process mbuf
         	uint8_t *pkt_data = rte_pktmbuf_mtod(mbuf, uint8_t *);
 
         	// Parse Ethernet header
         	struct rte_ether_hdr *eth_hdr = (struct rte_ether_hdr *)pkt_data;
 
         	// Check if packet is IPv4
-        	if (rte_be_to_cpu_16(eth_hdr->ether_type) != RTE_ETHER_TYPE_IPV4) 
+    	    if (rte_be_to_cpu_16(eth_hdr->ether_type) != RTE_ETHER_TYPE_IPV4) 
 			{
-            	// Drop non-IP packets
-            	rte_pktmbuf_free(mbuf);
-            	continue;
-        	}
+        	    // Drop non-IP packets
+        		rte_pktmbuf_free(mbuf);
+    	    	continue;
+	    	}
 
         	// Parse IPv4 header (immediately after Ethernet header)
         	struct rte_ipv4_hdr *ip_hdr = (struct rte_ipv4_hdr *)(pkt_data + sizeof(struct rte_ether_hdr));
 
         	// You can access IP info here, for example:
         	uint32_t src_ip = rte_be_to_cpu_32(ip_hdr->src_addr);
-        	uint32_t dst_ip = rte_be_to_cpu_32(ip_hdr->dst_addr);
+    		uint32_t dst_ip = rte_be_to_cpu_32(ip_hdr->dst_addr);
 
     		if (is_blocked_ip(src_ip)) 
 			{
         		rte_pktmbuf_free(mbuf); // Drop blocked
-        		continue;
-    		}
+    	    	continue;
+	    	}
 
         	// Modify destination MAC address to some predefined MAC
         	struct rte_ether_addr new_dst_mac = 
 			{
-            	.addr_bytes = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
-        	};
+	        	.addr_bytes = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
+    		};
         	rte_ether_addr_copy(&new_dst_mac, &eth_hdr->dst_addr);
 
         	// Add the packet to tx buffer list for forwarding
