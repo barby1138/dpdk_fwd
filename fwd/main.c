@@ -18,6 +18,7 @@
 #define BURST_SIZE 32
 
 static uint16_t num_queues = 1;
+static int stats_interval_sec = 1;
 
 #define MAX_LCORES 128
 #define MAX_PORTS 2
@@ -313,12 +314,15 @@ lcore_worker_main(__rte_unused void *arg)
 int parse_args(int argc, char **argv) 
 {
     int opt;
-    while ((opt = getopt(argc, argv, "q:")) != -1) 
+    while ((opt = getopt(argc, argv, "q:s:")) != -1) 
 	{
         switch (opt) 
 		{
             case 'q':
                 num_queues = (uint16_t)atoi(optarg);
+                break;
+			case 's':
+                stats_interval_sec = atoi(optarg);
                 break;
             default:
                 printf("Usage: %s [-q num_queues] -- <EAL args>\n", argv[0]);
@@ -330,7 +334,7 @@ int parse_args(int argc, char **argv)
 
 void usage() 
 {
-    printf("Usage: fwd [-q num_queues] -- <EAL args>\n");
+    printf("Usage: ./fwd [-q num_queues] [-s stats_interval_sec] -- <EAL args>\n");
     exit(EXIT_FAILURE);
 }
 
@@ -401,10 +405,8 @@ main(int argc, char *argv[])
     	qid++;
 	}
 
-	int stats_interval = 1; // configurable, e.g. via command-line
-
 	pthread_t stats_thread;
-	pthread_create(&stats_thread, NULL, stats_loop, &stats_interval);
+	pthread_create(&stats_thread, NULL, stats_loop, &stats_interval_sec);
 
 
 	/* clean up the EAL */
